@@ -24,6 +24,9 @@ usage() {
 
 # docker pull prometheus + node-exporter + alertmanager + grafana ...
 setup() {
+    cd "$dir/site/src"
+    npm install
+
     # docker pull ...
     log docker pull prom/prometheus
     docker pull prom/prometheus
