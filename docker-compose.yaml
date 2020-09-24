@@ -1,0 +1,68 @@
+version: "3"
+services:
+  site:
+    build:
+      context: ./site
+    container_name: site
+    ports:
+      - "5000:5000"
+
+  node-exporter:
+    container_name: node-exporter
+    image: prom/node-exporter
+    ports: 
+      - "9100:9100"
+
+  alertmanager:
+    container_name: alertmanager
+    image: prom/alertmanager
+    ports: 
+      - "9093:9093"
+    command: --config.file=/etc/alertmanager/compose-alert.yaml
+    volumes:
+      - ./compose-alert.yaml:/etc/alertmanager/compose-alert.yaml
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    ports: 
+      - "9090:9090"
+    command: --config.file=/etc/prometheus/prometheus.yaml
+    volumes:
+      - ./compose-prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - ./compose-rules.yaml:/etc/prometheus/rules.yaml
+      
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_AUTH_BASIC_ENABLED=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+
+  grafana-setup:
+    container_name: grafana-setup
+    image: alpine:3.10
+    depends_on:
+      - grafana
+    volumes:
+      - ./compose-datasource.json:/etc/grafana/compose-datasource.json
+      - ./compose-dashboard.json:/etc/grafana/compose-dashboard.json
+      - ./compose-my-dashboard.json:/etc/grafana/compose-my-dashboard.json
+    command: >
+      /bin/sh -c "
+        apk add --no-cache curl
+        echo 'waiting for grafana'
+        sleep 7s
+        cd /etc/grafana/
+        curl http://grafana:3000/api/datasources \
+          --header 'Content-Type: application/json' \
+          --data @compose-datasource.json
+        curl http://grafana:3000/api/dashboards/db \
+          --header 'Content-Type: application/json' \
+          --data @compose-dashboard.json
+        curl http://grafana:3000/api/dashboards/db \
+          --header 'Content-Type: application/json' \
+          --data @compose-my-dashboard.json"

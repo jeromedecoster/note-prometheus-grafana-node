@@ -1,0 +1,19 @@
+groups:
+  - name: memory-rules
+    rules:
+      - record: node_cpu_seconds_total:avg
+        expr: (((count(count(node_cpu_seconds_total{job="compose"}) by (cpu))) - avg(sum by (mode)(irate(node_cpu_seconds_total{mode='idle',job="compose"}[1m])))) * 100) / count(count(node_cpu_seconds_total{job="compose"}) by (cpu))
+      
+      - alert: memory-warning
+        expr: node_cpu_seconds_total:avg > 45
+        labels:
+          severity: warning
+        annotations:
+          description: Memory warning {{ $value }} !
+
+      - alert: memory-critical
+        expr: node_cpu_seconds_total:avg > 80
+        labels:
+          severity: critical
+        annotations:
+          description: Memory critical {{ $value }} !

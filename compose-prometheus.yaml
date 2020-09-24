@@ -1,0 +1,16 @@
+scrape_configs:
+  - job_name: 'compose'
+    scrape_interval: 5s
+    static_configs:
+    - targets:
+      - 'site:5000'
+      - 'node-exporter:9100'
+
+rule_files:
+  - '/etc/prometheus/rules.yaml'
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - 'alertmanager:9093'

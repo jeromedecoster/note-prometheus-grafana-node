@@ -1,0 +1,16 @@
+scrape_configs:
+  - job_name: 'local'
+    scrape_interval: 10s
+    static_configs:
+    - targets:
+      - '0.0.0.0:5000'
+      - '0.0.0.0:9100'
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - '0.0.0.0:9093'
+
+rule_files:
+  - '/etc/prometheus/rules.yaml'
