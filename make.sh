@@ -27,6 +27,14 @@ setup() {
     cd "$dir/site/src"
     npm install
 
+    # install stress
+    if [[ -z $(which stress) ]]
+    then
+        log install stress
+        warn warn sudo is required
+        sudo apt install --yes stress
+    fi
+    
     # docker pull ...
     log docker pull prom/prometheus
     docker pull prom/prometheus

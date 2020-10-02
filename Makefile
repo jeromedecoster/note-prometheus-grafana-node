@@ -4,7 +4,7 @@ help:
 	{ grep --extended-regexp '^[a-zA-Z_-]+:.*#[[:space:]].*$$' $(MAKEFILE_LIST) || true; } \
 	| awk 'BEGIN { FS = ":.*#[[:space:]]*" } { printf "\033[1;32m%-25s\033[0m%s\n", $$1, $$2 }'
 
-setup: # docker pull prometheus + node-exporter + alertmanager + grafana ...
+setup: # install stress + docker pull prometheus + node-exporter + alertmanager + grafana ...
 	./make.sh setup
 
 dev: # local development (by calling npm script directly)
